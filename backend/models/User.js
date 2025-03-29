@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs"
 
 const userSchema = new mongoose.Schema({
 
@@ -26,6 +27,21 @@ const userSchema = new mongoose.Schema({
     }
 
 });
+
+
+
+
+userSchema.pre("save" , async function(next){
+    if(!this.isModified("password")) return next();
+    const salt = await bcrypt.gensalt(10);
+ this.password = await bcrypt.hash(this.password,salt);
+ next();
+
+
+}
+
+
+
                           // first letter is uppercase by default it will be anyways converted to user from Users 
 const User = mongoose.model("User" , userSchema);
 

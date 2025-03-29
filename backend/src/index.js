@@ -10,6 +10,8 @@ const app = express();
 // actual -> cosnt port = process.env.port;
 const PORT = 3000;
 
+app.use(express.json());
+
 app.subscribe("/api/auth" , authRoutes);
 
 
