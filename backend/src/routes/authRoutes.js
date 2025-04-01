@@ -1,7 +1,15 @@
 import express from "express";
 import User from "../../models/User.js";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
+
+const generateToken = (userId) =>{
+    const token = jwt.sign({userId}, process.env.SECRET_KEY, {expiresIn: "15d"}
+        );
+
+
+}
 
 router.post("/register" , async (req , res)=>{
     try {
@@ -60,8 +68,22 @@ router.post("/register" , async (req , res)=>{
         profileImage,
      })
 
-    } catch (error) {
-        
+     await user.save();
+     const token = generateToken(user._id);
+
+     res.status(201).json({
+        token,
+        user:{
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            profileImage: user.profileImage,
+        },
+     }),
+    }
+     catch (error) {
+        console.log("error in register route" , error);
+        res.status(500).json({message: "internal server error"});
     }
 } ); 
 
