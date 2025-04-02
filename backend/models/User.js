@@ -38,8 +38,13 @@ userSchema.pre("save" , async function(next){
  next();
 
 
-})
+});
 
+// compare password
+
+userSchema.methods.comaprePassword = async function(userPassword){
+    return await bcrypt.compare(userPassword , this.password);
+}
 
 
                           // first letter is uppercase by default it will be anyways converted to user from Users 
