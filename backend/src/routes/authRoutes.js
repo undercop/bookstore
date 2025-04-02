@@ -1,7 +1,7 @@
 import express from "express";
 import User from "../../models/User.js";
 import jwt from "jsonwebtoken";
-import comaparePassword  from "../../models/User.js";
+
 const router = express.Router();
 
 const generateToken = (userId) => {
@@ -57,38 +57,41 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-    res.send("login");
-});
-
-router.post("/login" , async (req , res)=>{
     try {
-        
-        const{email, passowrd} = req.body;
-        if(!email || !passowrd) return res.status(400).json({
-            message: "all fields are required"
-        }) 
-        const user = await User.findOneAndDelete({
-            email
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(400).json({ message: "User does not exist" });
+        }
+
+        // Correct method to compare password
+        const isPasswordCorrect = await user.comparePassword(password);
+        if (!isPasswordCorrect) {
+            return res.status(400).json({ message: "Invalid credentials" });
+        }
+
+        // Generate token
+        const token = generateToken(user._id);
+
+        res.status(200).json({
+            token,
+            user: {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                profileImage: user.profileImage,
+            },
         });
-
-        if(!user) return res.status(400).json({
-            message: "user nonexistant"
-        })
-
-        const isPasswordCorrect = await user.comaparePassword(passowrd);
-        if(!isPasswordCorrect) return res.status(400).json(
-            {
-
-                message:"Invalid credentials"
-            }
-        )
     } catch (error) {
-        
-        console.log("error in login route" , error);
-        res.status(500).json({
-            message: "internal server error";
-        });
+        console.error("Error in login route", error);
+        res.status(500).json({ message: "Internal server error" });
     }
-})
+});
 
 export default router;
