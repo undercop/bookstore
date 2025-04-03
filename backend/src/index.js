@@ -1,6 +1,7 @@
 import express from "express";
 // import "dotenv/config";
 import authRoutes from "./routes/authRoutes.js"
+import bookRoutes from "./routes/bookRoutes.js"
 
 import { connectDB } from "../lib/db.js";
 
@@ -12,7 +13,8 @@ const PORT = 3000;
 
 app.use(express.json());
 
-app.subscribe("/api/auth" , authRoutes);
+app.use("/api/auth" , authRoutes);
+app.use("api/books" , bookRoutes);
 
 
 app.listen(PORT , () =>{
